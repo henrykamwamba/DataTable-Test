@@ -1,0 +1,74 @@
+﻿@model IEnumerable<DataTable.Models.CustomerDTO>
+@{
+    Layout = "_Layout";
+    var customers = Model == null ? Enumerable.Empty<DataTable.Models.CustomerDTO>() : Model;
+}
+<button id="btnLoad">Load With Jquery</button>
+
+<div id="divMessage"></div>
+
+<table id="dataTable" class="table-hover w-100">
+    <thead class="table-header">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.CustomerName)</th>
+            <th>@Html.DisplayNameFor(model => model.Gender)</th>
+            <th class="w-20px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in customers)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.CustomerName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Gender)</td>
+                <td class="text-right">
+                    <a asp-action="Details" asp-route-cid="@item.CustomerId" class="text-nowrap view-item">
+                        <span class='fas fa-search view-item'></span>
+                        View
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#dataTable").DataTable();
+
+        $("#btnLoad").click(function (e) {
+            var dataTable = $("#dataTable").DataTable();
+            e.preventDefault();
+
+            $.ajax({
+                type: "GET",
+                url: "/Customers/GetCustomers",
+                accept: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    dataTable.clear();
+                    if (data != null) {
+                        for (let i = 0; i < data.length; i++) {
+                            $("#dataTable").dataTable().fnAddData([
+                                data[i]["customerName"],
+                                data[i]["gender"],
+                                "<a href='/Customers/Details?cid=" + data[i]["customerId"] + "' class='text-nowrap view-item'><span class='fas fa-search view-item mr-2'></span>View</a>"
+                            ]);
+                        }
+                    }
+                    //redraw datatable
+                    dataTable.draw();
+                },
+                error: function (err) {
+                    if (err.status == 401) {
+                        location.reload(true);
+                    } else {
+                        $("#divMessage").html("<div class='alert alert-danger'>" +
+                            "<a href='#' class='close' data-dismiss='alert'>&times;</a>" +
+                            "An error occured while retrieving the records, please try again later</div>");
+                    }
+                }
+            });
+        });
+    });
+</script>
