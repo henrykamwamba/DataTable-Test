@@ -22,7 +22,7 @@
                 <td>@Html.DisplayFor(modelItem => item.CustomerName)</td>
                 <td>@Html.DisplayFor(modelItem => item.Gender)</td>
                 <td class="text-right">
-                    <a asp-action="Details" asp-route-cid="@item.CustomerId" class="text-nowrap view-item">
+                    <a asp-action="Details" asp-route-cid="@item.CustomerId">
                         <span class='fas fa-search view-item'></span>
                         View
                     </a>
@@ -47,12 +47,12 @@
                 dataType: "json",
                 success: function (data) {
                     dataTable.clear();
-                    if (data != null) {
+                    if (data) {
                         for (let i = 0; i < data.length; i++) {
                             $("#dataTable").dataTable().fnAddData([
                                 data[i]["customerName"],
                                 data[i]["gender"],
-                                "<a href='/Customers/Details?cid=" + data[i]["customerId"] + "' class='text-nowrap view-item'><span class='fas fa-search view-item mr-2'></span>View</a>"
+                                `<a href='/Customers/Details?cid=${data[i]["customerId"]}><span class='fas fa-search view-item mr-2'></span>View</a>`
                             ]);
                         }
                     }
